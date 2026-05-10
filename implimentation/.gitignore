@@ -1,0 +1,10 @@
+# Compiled binaries
+*.exe
+*.o
+*.out
+
+# Downloaded archives
+*.zip
+
+# Build artifacts
+server

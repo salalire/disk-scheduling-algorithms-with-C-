@@ -5,6 +5,6 @@
 using namespace std;
 
 vector<int> cscan(vector<int> requests, int head, int disk_size);
-int calculateSeekTime(vector<int> sequence, int head);
+// calculateSeekTime is declared in scan.h — no duplicate here
 
 #endif

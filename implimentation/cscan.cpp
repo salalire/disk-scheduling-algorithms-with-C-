@@ -41,14 +41,4 @@ vector<int> cscan(vector<int> requests, int head, int disk_size) {
     return sequence;
 }
 
-int calculateSeekTime(vector<int> sequence, int head) {
-    int total = 0;
-    int current = head;
-
-    for (int pos : sequence) {
-        total += abs(pos - current);
-        current = pos;
-    }
-
-    return total;
-}
+// calculateSeekTime is defined in scan.cpp — do not redefine here
