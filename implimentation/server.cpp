@@ -5,7 +5,6 @@
 //
 //  TEAM NOTES:
 //  This file is the bridge between the C++ algorithms and
-//  the frontend. It does NOT rewrite any algorithm logic.
 //  It simply:
 //    1. Receives JSON from the frontend via HTTP POST
 //    2. Calls the existing scan/cscan/comparison functions
@@ -40,8 +39,6 @@ using namespace std;
 
 // ============================================================
 //  HELPER: buildSteps
-//
-//  TEAM NOTES:
 //  This helper converts a seek sequence into a step-by-step
 //  movement list. Each step shows:
 //    - from  : where the head currently is
@@ -70,8 +67,6 @@ crow::json::wvalue buildSteps(const vector<int>& sequence, int head) {
 
 // ============================================================
 //  HELPER: parseRequest
-//
-//  TEAM NOTES:
 //  Reads the JSON body and extracts:
 //    disk_size, head, direction, requests[]
 //
@@ -141,8 +136,6 @@ bool parseRequest(
 int main() {
     // ----------------------------------------------------------
     //  CORS Middleware
-    //
-    //  TEAM NOTES:
     //  CORS = Cross-Origin Resource Sharing.
     //  Without this, the browser will BLOCK the frontend from
     //  calling this API because they run on different ports
@@ -179,8 +172,6 @@ int main() {
 
     // ==========================================================
     //  ENDPOINT: POST /scan
-    //
-    //  TEAM NOTES:
     //  Runs the SCAN (elevator) algorithm.
     //  Direction matters here — head moves in given direction,
     //  hits the end, then reverses.
@@ -233,8 +224,6 @@ int main() {
 
     // ==========================================================
     //  ENDPOINT: POST /cscan
-    //
-    //  TEAM NOTES:
     //  Runs the C-SCAN (Circular SCAN) algorithm.
     //  Direction is always RIGHT — head goes to the end,
     //  jumps back to 0, and continues. No reversal.
@@ -280,8 +269,6 @@ int main() {
 
     // ==========================================================
     //  ENDPOINT: POST /compare
-    //
-    //  TEAM NOTES:
     //  Runs BOTH algorithms on the same input and returns
     //  results side by side. The frontend uses this to show
     //  the comparison view.

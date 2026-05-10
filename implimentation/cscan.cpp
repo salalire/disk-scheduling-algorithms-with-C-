@@ -41,4 +41,4 @@ vector<int> cscan(vector<int> requests, int head, int disk_size) {
     return sequence;
 }
 
-// calculateSeekTime is defined in scan.cpp — do not redefine here
+// calculateSeekTime is defined in scan.cpp 
