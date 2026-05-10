@@ -47,7 +47,7 @@ int main() {
     cout << "Enter direction (left/right): ";
     cin >> direction;
 
-    // ===== Validation =====
+    // ===== Validation ====
     if (head < 0 || head >= disk_size) {
         cout << "Error: Invalid head position!\n";
         return 1;
