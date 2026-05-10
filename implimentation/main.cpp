@@ -1,6 +1,10 @@
 #include <iostream>
-#include <vector>
+#include <limits>
 #include <string>
+#include <vector>
+#include <algorithm>
+#include <fstream>
+
 #include "scan.h"
 #include "cscan.h"
 #include "comparison.h"
@@ -8,100 +12,331 @@
 
 using namespace std;
 
-// ===== Validation =====
-bool isValidDirection(string dir) {
-    return (dir == "left" || dir == "right");
+bool isValidDirection(const string& direction) {
+    return direction == "left" || direction == "right";
 }
 
-bool isValidRequest(vector<int>& requests, int disk_size) {
-    for (int r : requests) {
-        if (r < 0 || r >= disk_size)
+bool areRequestsWithinDiskRange(const vector<int>& requests, int diskSize) {
+    for (int request : requests) {
+        if (request < 0 || request >= diskSize) {
             return false;
+        }
     }
     return true;
 }
 
+void printSequence(const vector<int>& sequence) {
+    for (size_t i = 0; i < sequence.size(); ++i) {
+        cout << sequence[i];
+
+        if (i + 1 < sequence.size()) {
+            cout << " -> ";
+        }
+    }
+
+    cout << '\n';
+}
+
+void printAlgorithmBlock(
+    const string& title,
+    const vector<int>& sequence,
+    int seekTime,
+    int head
+) {
+    cout << "\n=== " << title << " ===\n";
+
+    cout << "Initial Head Position: "
+         << head << '\n';
+
+    cout << "Seek Sequence: ";
+    printSequence(sequence);
+
+    cout << "Total Seek Time: "
+         << seekTime << '\n';
+}
+
+bool readInt(const string& prompt, int& value) {
+    cout << prompt;
+
+    if (cin >> value) {
+        return true;
+    }
+
+    cin.clear();
+
+    cin.ignore(
+        numeric_limits<streamsize>::max(),
+        '\n'
+    );
+
+    return false;
+}
+
+int readMenuChoice() {
+    int choice = 0;
+
+    while (true) {
+        cout << "Enter choice: ";
+
+        if (cin >> choice &&
+            choice >= 1 &&
+            choice <= 3) {
+
+            cin.ignore(
+                numeric_limits<streamsize>::max(),
+                '\n'
+            );
+
+            return choice;
+        }
+
+        cout << "Error: choose 1, 2, or 3.\n";
+
+        cin.clear();
+
+        cin.ignore(
+            numeric_limits<streamsize>::max(),
+            '\n'
+        );
+    }
+}
+
+void saveToFile(
+    const string& algorithm,
+    const vector<int>& sequence
+) {
+    ofstream file("output.txt", ios::app);
+
+    if (!file) {
+        cout << "Error opening output file.\n";
+        return;
+    }
+
+    file << algorithm << ": ";
+
+    for (int value : sequence) {
+        file << value << " ";
+    }
+
+    file << '\n';
+
+    file.close();
+}
+
 int main() {
-    int disk_size, n, head, choice;
+
+    int diskSize = 0;
+    int requestCount = 0;
+    int head = 0;
+    int choice = 0;
+
     string direction;
 
+    vector<int> requests;
+
     cout << "===== Disk Scheduling Simulator =====\n";
+    cout << "Member 4: Input, Validation, and Output\n\n";
 
-    // ===== Input =====
-    cout << "Enter disk size: ";
-    cin >> disk_size;
-
-    cout << "Enter number of requests: ";
-    cin >> n;
-
-    vector<int> requests(n);
-
-    cout << "Enter request sequence: ";
-    for (int i = 0; i < n; i++) {
-        cin >> requests[i];
+    while (
+        !readInt("Enter disk size: ", diskSize)
+        || diskSize <= 0
+    ) {
+        cout << "Error: disk size must be greater than 0.\n";
     }
 
-    cout << "Enter initial head position: ";
-    cin >> head;
-
-    cout << "Enter direction (left/right): ";
-    cin >> direction;
-
-    // ===== Validation ====
-    if (head < 0 || head >= disk_size) {
-        cout << "Error: Invalid head position!\n";
-        return 1;
+    while (
+        !readInt(
+            "Enter number of requests: ",
+            requestCount
+        )
+        || requestCount <= 0
+    ) {
+        cout << "Error: number of requests must be greater than 0.\n";
     }
 
-    if (!isValidDirection(direction)) {
-        cout << "Error: Direction must be 'left' or 'right'!\n";
-        return 1;
+    requests.resize(requestCount);
+
+    cout << "Enter request sequence separated by spaces:\n";
+
+    for (int i = 0; i < requestCount; ++i) {
+
+        while (
+            !(cin >> requests[i])
+            || requests[i] < 0
+            || requests[i] >= diskSize
+        ) {
+
+            cout << "Error: request must be between 0 and "
+                 << diskSize - 1
+                 << ". Enter request "
+                 << i + 1
+                 << " again: ";
+
+            cin.clear();
+
+            cin.ignore(
+                numeric_limits<streamsize>::max(),
+                '\n'
+            );
+        }
     }
 
-    if (!isValidRequest(requests, disk_size)) {
-        cout << "Error: Request out of disk range!\n";
-        return 1;
+    cin.ignore(
+        numeric_limits<streamsize>::max(),
+        '\n'
+    );
+
+    while (
+        !readInt(
+            "Enter initial head position: ",
+            head
+        )
+        || head < 0
+        || head >= diskSize
+    ) {
+
+        cout << "Error: head position must be between 0 and "
+             << diskSize - 1
+             << ".\n";
     }
 
-    // ===== Menu =====
+    while (true) {
+
+        cout << "Enter direction (left/right): ";
+
+        if (!(cin >> direction)) {
+
+            cout << "Error: invalid input.\n";
+
+            cin.clear();
+
+            cin.ignore(
+                numeric_limits<streamsize>::max(),
+                '\n'
+            );
+
+            continue;
+        }
+
+        if (isValidDirection(direction)) {
+            break;
+        }
+
+        cout << "Error: direction must be "
+             << "'left' or 'right'.\n";
+    }
+
+    cin.ignore(
+        numeric_limits<streamsize>::max(),
+        '\n'
+    );
+
     cout << "\nChoose Operation:\n";
     cout << "1. Run SCAN\n";
     cout << "2. Run C-SCAN\n";
     cout << "3. Compare Both\n";
-    cout << "Enter choice: ";
-    cin >> choice;
 
-    cout << "\n";
+    choice = readMenuChoice();
 
-    // ===== Execution =====
     if (choice == 1) {
-        vector<int> seq = scan(requests, head, disk_size, direction);
-        int seek = calculateSeekTime(seq, head);
 
-        cout << "=== SCAN Algorithm ===\n";
-        cout << "Seek Sequence: ";
-        for (int x : seq) cout << x << " ";
-        cout << "\nTotal Seek Time: " << seek << "\n\n";
+        vector<int> sequence =
+            scan(requests, head, diskSize, direction);
 
-        printHeadMovements(seq, head);
+        int seekTime =
+            calculateSeekTime(sequence, head);
+
+        printAlgorithmBlock(
+            "SCAN Algorithm",
+            sequence,
+            seekTime,
+            head
+        );
+
+        printHeadMovements(sequence, head);
+
+        saveToFile("SCAN", sequence);
     }
+
     else if (choice == 2) {
-        vector<int> seq = cscan(requests, head, disk_size);
-        int seek = calculateSeekTime(seq, head);
 
-        cout << "=== C-SCAN Algorithm ===\n";
-        cout << "Seek Sequence: ";
-        for (int x : seq) cout << x << " ";
-        cout << "\nTotal Seek Time: " << seek << "\n\n";
+        vector<int> sequence =
+            cscan(requests, head, diskSize);
 
-        printHeadMovements(seq, head);
+        int seekTime =
+            calculateSeekTime(sequence, head);
+
+        printAlgorithmBlock(
+            "C-SCAN Algorithm",
+            sequence,
+            seekTime,
+            head
+        );
+
+        printHeadMovements(sequence, head);
+
+        saveToFile("CSCAN", sequence);
     }
-    else if (choice == 3) {
-        compareAlgorithms(requests, head, disk_size, direction);
-    }
+
     else {
-        cout << "Invalid choice!\n";
+
+        vector<int> scanSequence =
+            scan(requests, head, diskSize, direction);
+
+        vector<int> cscanSequence =
+            cscan(requests, head, diskSize);
+
+        int scanSeek =
+            calculateSeekTime(scanSequence, head);
+
+        int cscanSeek =
+            calculateSeekTime(cscanSequence, head);
+
+        cout << "\n=== Comparison ===\n";
+
+        printAlgorithmBlock(
+            "SCAN Algorithm",
+            scanSequence,
+            scanSeek,
+            head
+        );
+
+        printHeadMovements(
+            scanSequence,
+            head
+        );
+
+        printAlgorithmBlock(
+            "C-SCAN Algorithm",
+            cscanSequence,
+            cscanSeek,
+            head
+        );
+
+        printHeadMovements(
+            cscanSequence,
+            head
+        );
+
+        saveToFile("SCAN", scanSequence);
+        saveToFile("CSCAN", cscanSequence);
+
+        cout << "\nWinner: ";
+
+        if (scanSeek < cscanSeek) {
+            cout << "SCAN\n";
+        }
+
+        else if (cscanSeek < scanSeek) {
+            cout << "C-SCAN\n";
+        }
+
+        else {
+            cout << "TIE\n";
+        }
     }
+
+    cout << "\nProgram finished successfully.\n";
 
     return 0;
 }
