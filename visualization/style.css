@@ -3,27 +3,35 @@ body {
     text-align: center;
     background: linear-gradient(to right, #1e3c72, #2a5298);
     color: white;
+    padding-bottom: 40px;
 }
 
 h2 {
     margin-top: 20px;
 }
 
+h3 {
+    margin: 10px 0 5px;
+}
+
 canvas {
     border-radius: 12px;
-    margin-top: 20px;
-    background: #ffffff;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    margin-top: 10px;
+    background: #1a1a2e;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 button {
     padding: 12px 25px;
-    margin: 10px;
+    margin: 6px;
     border: none;
     border-radius: 25px;
     background: #ff7b00;
     color: white;
-    font-size: 16px;
+    font-size: 15px;
     cursor: pointer;
     transition: 0.3s;
 }
@@ -33,28 +41,37 @@ button:hover {
     transform: scale(1.05);
 }
 
-#legend {
-    margin-top: 15px;
-    font-size: 14px;
-}
-
-#info {
-    margin-top: 15px;
-    font-size: 18px;
-}
 .controls {
     margin-top: 20px;
 }
 
-input {
+input, select {
     padding: 10px;
     margin: 5px;
-    width: 250px;
+    width: 260px;
     border-radius: 10px;
     border: none;
     outline: none;
+    font-size: 14px;
+    background: #ffffffee;
+    color: #333;
 }
 
 input::placeholder {
     color: #999;
+}
+
+#error {
+    font-size: 15px;
+    min-height: 20px;
+    margin: 8px 0;
+}
+
+#scan-section, #cscan-section {
+    margin-top: 20px;
+}
+
+#compare-result {
+    margin-top: 15px;
+    font-size: 18px;
 }

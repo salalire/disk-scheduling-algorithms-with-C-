@@ -1,27 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Disk Scheduling Visualization</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
 
 <h2>Disk Scheduling Visualization</h2>
 
 <div class="controls">
-    <input id="head" placeholder="Initial Head (e.g. 50)" />
-    <input id="requests" placeholder="Requests (e.g. 82,140,170,190,43,24,16)" />
+    <!-- All 4 inputs the API needs -->
+    <input id="disk_size"  placeholder="Disk Size (e.g. 200)"  type="number" />
+    <input id="head"       placeholder="Initial Head (e.g. 50)" type="number" />
+    <input id="requests"   placeholder="Requests (e.g. 98,183,41,122,14,124,65,67)" />
+    <select id="direction">
+        <option value="right">Direction: Right</option>
+        <option value="left">Direction: Left</option>
+    </select>
 
-    <br>
+    <br><br>
 
     <button onclick="run('scan')">Run SCAN</button>
     <button onclick="run('cscan')">Run C-SCAN</button>
+    <button onclick="run('compare')">Compare Both</button>
 </div>
 
-<canvas id="canvas" width="900" height="400"></canvas>
+<div id="error" style="color:red; margin: 10px 0;"></div>
 
-<div id="info"></div>
+<!-- One canvas per algorithm -->
+<div id="scan-section"  style="display:none">
+    <h3 id="scan-title"></h3>
+    <canvas id="scan-canvas"  width="900" height="300"></canvas>
+</div>
+
+<div id="cscan-section" style="display:none">
+    <h3 id="cscan-title"></h3>
+    <canvas id="cscan-canvas" width="900" height="300"></canvas>
+</div>
+
+<div id="compare-result"></div>
+
 <script src="script.js"></script>
 </body>
 </html>
