@@ -1,172 +1,94 @@
 #include <iostream>
 #include <vector>
-#include <string>
-#include <cmath>
-
 #include "scan.h"
 #include "cscan.h"
+#include "comparison.h"
+#include "headmovement.h"
 
 using namespace std;
 
-// ======================= INPUT STRUCT =======================
+int main() {
 
-struct RequestData {
-    int disk_size;
-    int head;
+    int disk_size, n, head;
     string direction;
     vector<int> requests;
-};
 
-// ======================= VALIDATION =========================
+    cout << "===== Disk Scheduling Simulator =====\n";
 
-bool validate(const RequestData& data) {
+    cout << "Enter disk size: ";
+    cin >> disk_size;
 
-    if (data.disk_size <= 0) {
-        cout << "Error: Invalid disk size\n";
-        return false;
-    }
+    cout << "Enter number of requests: ";
+    cin >> n;
 
-    if (data.head < 0 ||
-        data.head >= data.disk_size) {
+    cout << "Enter request queue:\n";
 
-        cout << "Error: Invalid head position\n";
-        return false;
-    }
+    for (int i = 0; i < n; i++) {
+        int x;
+        cin >> x;
 
-    if (data.direction != "left" &&
-        data.direction != "right") {
-
-        cout << "Error: Direction must be left or right\n";
-        return false;
-    }
-
-    if (data.requests.empty()) {
-        cout << "Error: Request queue is empty\n";
-        return false;
-    }
-
-    for (int r : data.requests) {
-
-        if (r < 0 || r >= data.disk_size) {
-
-            cout << "Error: Request "
-                 << r
-                 << " out of range\n";
-
-            return false;
+        // validation
+        if (x < 0 || x >= disk_size) {
+            cout << "Invalid request!\n";
+            return 1;
         }
+
+        requests.push_back(x);
     }
 
-    return true;
-}
+    cout << "Enter initial head position: ";
+    cin >> head;
 
-// ======================= SEEK TIME ==========================
-
-int calculateSeekTime(
-    const vector<int>& seq,
-    int head
-) {
-
-    int total = 0;
-
-    for (int x : seq) {
-
-        total += abs(x - head);
-
-        head = x;
+    if (head < 0 || head >= disk_size) {
+        cout << "Invalid head position!\n";
+        return 1;
     }
 
-    return total;
-}
+    cout << "Enter direction (left/right): ";
+    cin >> direction;
 
-// ======================= PRINT RESULT =======================
-
-void printResult(
-    string name,
-    vector<int> seq,
-    int seek
-) {
-
-    cout << "\n=== "
-         << name
-         << " ===\n";
-
-    cout << "Seek Sequence: ";
-
-    for (size_t i = 0; i < seq.size(); i++) {
-
-        cout << seq[i];
-
-        if (i != seq.size() - 1)
-            cout << " -> ";
+    if (direction != "left" && direction != "right") {
+        cout << "Invalid direction!\n";
+        return 1;
     }
 
-    cout << "\nTotal Seek Time: "
-         << seek
-         << "\n";
-}
+    // SCAN
+    vector<int> scanSeq = scan(requests, head, disk_size, direction);
+    int scanSeek = calculateSeekTime(scanSeq, head);
 
-// ======================= MAIN PROCESS =======================
+    cout << "\n===== SCAN Algorithm =====\n";
+    cout << "Seek Sequence:\n";
 
-void process(RequestData data) {
-
-    // Validate input
-    if (!validate(data)) {
-        return;
+    for (int pos : scanSeq) {
+        cout << pos << " ";
     }
 
-    // Run SCAN
-    vector<int> scanSeq =
-        scan(
-            data.requests,
-            data.head,
-            data.disk_size,
-            data.direction
-        );
+    cout << "\nTotal Seek Time: " << scanSeek << endl;
+    printHeadMovements(scanSeq, head);
 
-    // Run C-SCAN
-    vector<int> cscanSeq =
-        cscan(
-            data.requests,
-            data.head,
-            data.disk_size
-        );
+    // C-SCAN
+    vector<int> cscanSeq = cscan(requests, head, disk_size);
+    int cscanSeek = calculateSeekTime(cscanSeq, head);
 
-    // Calculate seek times
-    int scanSeek =
-        calculateSeekTime(
-            scanSeq,
-            data.head
-        );
+    cout << "\n===== C-SCAN Algorithm =====\n";
+    cout << "Seek Sequence:\n";
 
-    int cscanSeek =
-        calculateSeekTime(
-            cscanSeq,
-            data.head
-        );
+    for (int pos : cscanSeq) {
+        cout << pos << " ";
+    }
 
-    // Print outputs
-    printResult(
-        "SCAN",
-        scanSeq,
-        scanSeek
-    );
-
-    printResult(
-        "C-SCAN",
-        cscanSeq,
-        cscanSeek
-    );
+    cout << "\nTotal Seek Time: " << cscanSeek << endl;
+    printHeadMovements(cscanSeq, head);
 
     // Comparison
-    cout << "\nWinner: ";
+    cout << "\n===== Comparison =====\n";
 
     if (scanSeek < cscanSeek)
-        cout << "SCAN\n";
-
+        cout << "SCAN is more efficient.\n";
     else if (cscanSeek < scanSeek)
-        cout << "C-SCAN\n";
-
+        cout << "C-SCAN is more efficient.\n";
     else
-        cout << "TIE\n";
+        cout << "Both have equal performance.\n";
+
+    return 0;
 }
