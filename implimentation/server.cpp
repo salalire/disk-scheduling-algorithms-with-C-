@@ -25,6 +25,7 @@
 //  }
 // ============================================================
 
+#define CROW_ENABLE_SSL 0
 #include "crow_all.h"   // Crow framework (single header)
 #include "scan.h"       // scan() and calculateSeekTime()
 #include "cscan.h"      // cscan()

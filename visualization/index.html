@@ -5,14 +5,23 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    
 
 <h2>Disk Scheduling Visualization</h2>
 
-<button onclick="draw('scan')">Show SCAN</button>
-<button onclick="draw('cscan')">Show C-SCAN</button>
+<div class="controls">
+    <input id="head" placeholder="Initial Head (e.g. 50)" />
+    <input id="requests" placeholder="Requests (e.g. 82,140,170,190,43,24,16)" />
 
-<canvas id="canvas" width="800" height="300"></canvas>
+    <br>
 
+    <button onclick="run('scan')">Run SCAN</button>
+    <button onclick="run('cscan')">Run C-SCAN</button>
+</div>
+
+<canvas id="canvas" width="900" height="400"></canvas>
+
+<div id="info"></div>
 <script src="script.js"></script>
 </body>
 </html>
